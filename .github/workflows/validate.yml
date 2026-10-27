@@ -24,9 +24,6 @@ jobs:
 
   windows:
     runs-on: windows-latest
-    env:
-      TEMP: ${{ runner.temp }}
-      TMP: ${{ runner.temp }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -39,5 +36,8 @@ jobs:
       - shell: pwsh
         run: python -X utf8 -m unittest discover -s scripts/tests -v
       - shell: pwsh
+        env:
+          TEMP: ${{ runner.temp }}
+          TMP: ${{ runner.temp }}
         run: python -X utf8 -m unittest discover -s skills/cross-device-project-sync/tests -v
 
