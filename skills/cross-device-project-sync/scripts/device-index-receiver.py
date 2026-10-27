@@ -817,7 +817,7 @@ def validate_project_release(metadata_path: Path, assets_root: Path, repository:
         raise ReceiverError(f"project backup source identity does not match device index: {tag}")
     expected_names = {
         "BACKUP_MANIFEST.json", "RELEASE_BINDING.json", "README.md", "RESTORE.txt",
-        "restore.ps1", "verify_split_tar.py", "verify_restored_tree.py",
+        "restore.ps1", "verify_split_tar.py", "verify_restored_tree.py", "extract_verified_tar.py",
         *(safe_asset_name(item.get("name"), "project backup part name") for item in parts),
     }
     if set(remote_assets) != expected_names:

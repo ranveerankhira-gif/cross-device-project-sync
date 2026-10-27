@@ -14,7 +14,8 @@ MARKER_SUFFIX = ".cross-device-owned-temp.json"
 
 
 def _absolute(path: Path) -> Path:
-    return Path(os.path.abspath(path))
+    # Resolve existing Windows 8.3 aliases before ownership containment checks.
+    return Path(os.path.realpath(os.path.abspath(path)))
 
 
 def _is_link_like(path: Path) -> bool:
@@ -28,7 +29,7 @@ def _marker(path: Path) -> Path:
 
 def _inside(path: Path, root: Path) -> bool:
     try:
-        _absolute(path).relative_to(root.resolve())
+        _absolute(path).relative_to(_absolute(root))
         return True
     except ValueError:
         return False

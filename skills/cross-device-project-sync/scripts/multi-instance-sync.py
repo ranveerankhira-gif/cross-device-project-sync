@@ -90,7 +90,9 @@ def path_key(value: Path | str) -> str:
             text = "\\\\" + text[8:]
         elif folded.startswith("\\\\?\\"):
             text = text[4:]
-    return os.path.normpath(os.path.abspath(text)).casefold()
+    # realpath also expands an existing Windows 8.3 alias (for example
+    # RUNNER~1) so registry and caller spellings compare by filesystem identity.
+    return os.path.normpath(os.path.realpath(os.path.abspath(text))).casefold()
 
 
 def is_within(path: Path, parent: Path) -> bool:

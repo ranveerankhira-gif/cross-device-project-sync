@@ -204,8 +204,6 @@ function Resolve-WindowsSystemExecutable {
     return (Resolve-Path -LiteralPath $path).Path
 }
 
-$tarExecutable = Resolve-WindowsSystemExecutable -Name 'tar.exe'
-
 function Resolve-DeviceLabel {
     param([string]$Requested)
     $label = $Requested
@@ -352,13 +350,17 @@ $backupRoot = if ([string]::IsNullOrWhiteSpace($BackupPath)) {
 $manifestPath = Join-Path $backupRoot 'BACKUP_MANIFEST.json'
 $archiveVerifier = Join-Path $helperRoot 'verify-split-tar.py'
 $restoreVerifier = Join-Path $helperRoot 'verify-restored-tree.py'
+$archiveExtractor = Join-Path $helperRoot 'extract-verified-tar.py'
 if (-not (Test-Path -LiteralPath $archiveVerifier -PathType Leaf)) {
     $archiveVerifier = Join-Path $helperRoot 'verify_split_tar.py'
 }
 if (-not (Test-Path -LiteralPath $restoreVerifier -PathType Leaf)) {
     $restoreVerifier = Join-Path $helperRoot 'verify_restored_tree.py'
 }
-foreach ($required in @($manifestPath, $archiveVerifier, $restoreVerifier)) {
+if (-not (Test-Path -LiteralPath $archiveExtractor -PathType Leaf)) {
+    $archiveExtractor = Join-Path $helperRoot 'extract_verified_tar.py'
+}
+foreach ($required in @($manifestPath, $archiveVerifier, $restoreVerifier, $archiveExtractor)) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
         throw "Required restore file is missing: $required"
     }
@@ -552,12 +554,12 @@ try {
             }
 
             # Every expected output path now exists as a locked ordinary directory
-            # or file. tar.exe may write bytes and metadata but cannot replace an
-            # expected path with a link while the handles remain open.
+            # or file. The extractor writes only verified regular-file payloads and
+            # cannot replace an expected path with a link while the handles remain open.
             Assert-NoReparsePointInExistingPath -Path $destinationFull
-            & $tarExecutable -xf $combinedTar -C $destinationFull
+            & $python $archiveExtractor $combinedTar $destinationFull $manifestPath
             if ($LASTEXITCODE -ne 0) {
-                throw "tar.exe extraction failed with exit code $LASTEXITCODE; partial output and combined TAR were retained for inspection."
+                throw "Verified TAR extraction failed with exit code $LASTEXITCODE; partial output and combined TAR were retained for inspection."
             }
         }
         finally {

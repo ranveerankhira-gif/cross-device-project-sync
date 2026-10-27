@@ -134,7 +134,7 @@ function Verify-Release([string]$Tag, [ValidateSet('project-backup','conversatio
             & $python -X utf8 (Join-Path $scriptRoot 'incremental-device-sync.py') manifest-fingerprint --manifest $manifestPath --expected $Identity | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "Project Release tree fingerprint mismatch: $Tag" }
             foreach ($part in @($manifest.parts)) { Assert-RemoteAsset $release ([string]$part.name) ([int64]$part.size) ([string]$part.sha256) }
-            $expectedNames = @('BACKUP_MANIFEST.json','RELEASE_BINDING.json','README.md','RESTORE.txt','restore.ps1','verify_split_tar.py','verify_restored_tree.py') + @($manifest.parts | ForEach-Object { [string]$_.name })
+            $expectedNames = @('BACKUP_MANIFEST.json','RELEASE_BINDING.json','README.md','RESTORE.txt','restore.ps1','verify_split_tar.py','verify_restored_tree.py','extract_verified_tar.py') + @($manifest.parts | ForEach-Object { [string]$_.name })
             if (@($release.assets).Count -ne $expectedNames.Count -or @($release.assets | Where-Object { $_.name -notin $expectedNames }).Count) { throw "Project Release asset inventory mismatch: $Tag" }
             foreach ($name in $expectedNames) { [void](Get-RemoteAsset $release $name) }
         } else {

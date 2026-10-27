@@ -311,7 +311,7 @@ if ($selectedTargetBranch -notmatch '^[A-Za-z0-9][A-Za-z0-9._/-]{0,255}$') {
     throw 'The selected target branch name is invalid.'
 }
 
-$supportNames = @('BACKUP_MANIFEST.json', 'RELEASE_BINDING.json', 'README.md', 'RESTORE.txt', 'restore.ps1', 'verify_split_tar.py', 'verify_restored_tree.py')
+$supportNames = @('BACKUP_MANIFEST.json', 'RELEASE_BINDING.json', 'README.md', 'RESTORE.txt', 'restore.ps1', 'verify_split_tar.py', 'verify_restored_tree.py', 'extract_verified_tar.py')
 if ($hasConversationHandoff) {
     $supportNames += @('CONVERSATION_HANDOFF_MANIFEST.json', 'CONVERSATION_HANDOFF.zip')
 }
@@ -524,6 +524,7 @@ $trustedHelpers = @{
     'restore.ps1' = Join-Path $PSScriptRoot 'restore-full-backup.ps1'
     'verify_split_tar.py' = Join-Path $PSScriptRoot 'verify-split-tar.py'
     'verify_restored_tree.py' = Join-Path $PSScriptRoot 'verify-restored-tree.py'
+    'extract_verified_tar.py' = Join-Path $PSScriptRoot 'extract-verified-tar.py'
 }
 foreach ($name in $trustedHelpers.Keys) {
     $trustedPath = $trustedHelpers[$name]

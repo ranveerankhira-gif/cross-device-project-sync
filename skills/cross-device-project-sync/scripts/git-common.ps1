@@ -48,7 +48,7 @@ function Stop-SyncProcessTree {
 }
 
 function Set-SyncGitExecutable {
-    param([AllowEmptyString()][string]$Path)
+    param([AllowNull()][AllowEmptyString()][string]$Path)
     if ([string]::IsNullOrWhiteSpace($Path)) {
         $command = @(Get-Command git -CommandType Application -ErrorAction Stop)[0]
         $script:SyncGitExecutable = $command.Source

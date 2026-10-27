@@ -296,8 +296,9 @@ $createScript = Join-Path $scriptRoot 'create-split-tar.py'
 $verifyMirrorScript = Join-Path $scriptRoot 'verify-mirror-tree.py'
 $verifyScript = Join-Path $scriptRoot 'verify-split-tar.py'
 $verifyRestoreScript = Join-Path $scriptRoot 'verify-restored-tree.py'
+$extractScript = Join-Path $scriptRoot 'extract-verified-tar.py'
 $restoreScript = Join-Path $scriptRoot 'restore-full-backup.ps1'
-foreach ($required in @($createScript, $verifyMirrorScript, $verifyScript, $verifyRestoreScript, $restoreScript)) {
+foreach ($required in @($createScript, $verifyMirrorScript, $verifyScript, $verifyRestoreScript, $extractScript, $restoreScript)) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
         throw "Required helper is missing: $required"
     }
@@ -397,6 +398,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Copy-Item -LiteralPath $verifyScript -Destination (Join-Path $prepared 'verify_split_tar.py')
 Copy-Item -LiteralPath $verifyRestoreScript -Destination (Join-Path $prepared 'verify_restored_tree.py')
+Copy-Item -LiteralPath $extractScript -Destination (Join-Path $prepared 'extract_verified_tar.py')
 Copy-Item -LiteralPath $restoreScript -Destination (Join-Path $prepared 'restore.ps1')
 
 Write-Host 'Performing full second-pass verification...'
@@ -412,8 +414,8 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $manifest = Get-Content -LiteralPath (Join-Path $prepared 'BACKUP_MANIFEST.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if (([int]$manifest.parts.Count + 7) -gt 1000) {
-    throw "The prepared backup needs $([int]$manifest.parts.Count + 7) GitHub Release assets after upload adds its Release binding, exceeding the supported 1000-asset limit. Prepare again with larger parts."
+if (([int]$manifest.parts.Count + 8) -gt 1000) {
+    throw "The prepared backup needs $([int]$manifest.parts.Count + 8) GitHub Release assets after upload adds its Release binding, exceeding the supported 1000-asset limit. Prepare again with larger parts."
 }
 $readme = @"
 # Complete project backup

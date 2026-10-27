@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -139,6 +140,7 @@ try {{ [void](Assert-ExactDelimitedMetadataField -Body "Summary; Backup-Manifest
         self.assertIn("Assert-ReleaseContentIdentity -Release $final", prepared)
         self.assertIn("Assert-DraftIdentity -Release $rolledBack", prepared)
 
+    @unittest.skipUnless(os.name == "nt", "native Windows picker")
     def test_project_picker_native_helper_compiles_without_opening_ui(self):
         with tempfile.TemporaryDirectory(prefix="project-picker-compile-") as raw:
             base = Path(raw)

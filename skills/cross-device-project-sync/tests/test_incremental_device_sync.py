@@ -686,7 +686,9 @@ class IncrementalDeviceSyncTests(unittest.TestCase):
             "-PythonExe", sys.executable, "-PreflightOnly",
         ], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60, env=env)
         self.assertNotEqual(completed.returncode, 0)
-        self.assertIn("does not prove a complete per-project conversation inventory", completed.stdout + completed.stderr)
+        combined = completed.stdout + completed.stderr
+        self.assertIn("does not prove a complete per-project conversation", combined)
+        self.assertIn("inventory; upload is blocked", combined)
 
     def test_registered_project_discovery_scans_all_local_session_metadata(self):
         codex_home = self.base / "codex-home-discovery"

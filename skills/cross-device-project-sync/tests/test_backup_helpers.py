@@ -19,7 +19,10 @@ import time
 import unittest
 from unittest import mock
 import zipfile
-import winreg
+try:
+    import winreg
+except ModuleNotFoundError:  # pragma: no cover - exercised by portable CI
+    winreg = None
 
 
 parser = argparse.ArgumentParser()
@@ -30,6 +33,7 @@ if not options.powershell:
     parser.error("PowerShell is required")
 
 
+@unittest.skipUnless(os.name == "nt", "Windows-only backup and restore integration tests")
 class BackupHelpers(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -79,6 +83,7 @@ class BackupHelpers(unittest.TestCase):
         for source_name, target_name in (
             ("verify-split-tar.py", "verify_split_tar.py"),
             ("verify-restored-tree.py", "verify_restored_tree.py"),
+            ("extract-verified-tar.py", "extract_verified_tar.py"),
             ("restore-full-backup.ps1", "restore.ps1"),
         ):
             shutil.copy2(options.skill_root / "scripts" / source_name, cls.backup / target_name)
@@ -329,6 +334,7 @@ class BackupHelpers(unittest.TestCase):
         self.assertEqual(prepared_manifest["source_device"], self.device_label)
         self.assertEqual(prepared_manifest["source_computer"].upper(), os.environ["COMPUTERNAME"].upper())
         self.assertTrue((prepared / "verify_restored_tree.py").is_file())
+        self.assertTrue((prepared / "extract_verified_tar.py").is_file())
         self.assertFalse((runs[0] / "snapshot" / self.source.name / "tools" / "browser-test-profile").exists())
         self.assertFalse((prepared / ".git").exists())
 
@@ -669,6 +675,7 @@ class BackupHelpers(unittest.TestCase):
         helper.mkdir()
         shutil.copy2(options.skill_root / "scripts" / "restore-full-backup.ps1", helper)
         shutil.copy2(options.skill_root / "scripts" / "verify-split-tar.py", helper)
+        shutil.copy2(options.skill_root / "scripts" / "extract-verified-tar.py", helper)
         signal = self.base / "restore-write-lock.signal"
         wrapper = helper / "verify-restored-tree.py"
         wrapper.write_text(
@@ -978,7 +985,7 @@ class BackupHelpers(unittest.TestCase):
         final = json.loads(state.read_text())
         manifest = json.loads((self.backup / "BACKUP_MANIFEST.json").read_text(encoding="utf-8"))
         self.assertFalse(final["draft"])
-        self.assertEqual(len(final["assets"]), 7 + len(manifest["parts"]))
+        self.assertEqual(len(final["assets"]), 8 + len(manifest["parts"]))
         trusted_restore = (self.backup / "RESTORE.txt").read_text(encoding="utf-8-sig")
         self.assertNotIn("untrusted-helper", trusted_restore)
         self.assertIn("backup-test-001", trusted_restore)
@@ -1151,6 +1158,7 @@ class BackupHelpers(unittest.TestCase):
         backup = self.copy_backup("trusted-helper-backup")
         (backup / "verify_split_tar.py").write_text("raise SystemExit('untrusted verifier executed')\n", encoding="utf-8")
         (backup / "verify_restored_tree.py").write_text("raise SystemExit('untrusted verifier executed')\n", encoding="utf-8")
+        (backup / "extract_verified_tar.py").write_text("raise SystemExit('untrusted extractor executed')\n", encoding="utf-8")
         destination = self.base / "trusted-helper-restored"
         self.run_command([
             options.powershell,
@@ -1194,6 +1202,7 @@ class BackupHelpers(unittest.TestCase):
         for source_name, target_name in (
             ("verify-split-tar.py", "verify_split_tar.py"),
             ("verify-restored-tree.py", "verify_restored_tree.py"),
+            ("extract-verified-tar.py", "extract_verified_tar.py"),
             ("restore-full-backup.ps1", "restore.ps1"),
         ):
             shutil.copy2(options.skill_root / "scripts" / source_name, backup / target_name)
