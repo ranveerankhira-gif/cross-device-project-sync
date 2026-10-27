@@ -1,0 +1,6 @@
+interface:
+  display_name: "跨设备项目同步"
+  short_description: "跨设备备份、恢复项目与 Codex 对话，并安全同步 Git"
+  default_prompt: "使用 $cross-device-project-sync 为我明确指定的 Windows 设备或项目执行可验证的备份、恢复、对话接力或 Git 同步。"
+policy:
+  allow_implicit_invocation: false

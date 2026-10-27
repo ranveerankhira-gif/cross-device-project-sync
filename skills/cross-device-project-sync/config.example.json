@@ -1,0 +1,7 @@
+{
+  "repository": "example-owner/example-private-backups",
+  "machineStateRoot": "D:\\Example\\CrossDeviceSync\\machine-state",
+  "instanceRegistry": "D:\\Example\\CrossDeviceSync\\machine-state\\instances.json",
+  "device": {"device_label": "device-a", "computer_name": "WORKSTATION-A"},
+  "notes": "Set CROSS_DEVICE_SYNC_REPOSITORY, CROSS_DEVICE_SYNC_STATE_ROOT and CROSS_DEVICE_SYNC_REGISTRY. Store real account homes, device names and repository identity outside the Skill directory."
+}

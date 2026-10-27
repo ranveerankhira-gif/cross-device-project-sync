@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "repository": "ranveerankhira-gif/cross-device-project-sync",
+  "skills": [
+    {
+      "name": "cross-device-project-sync",
+      "display_name_zh": "跨设备项目同步",
+      "purpose_zh": "在 Windows 设备间可验证地备份、恢复完整项目与允许迁移的 Codex 对话，并处理明确要求的 Git 同步",
+      "release": "v0.1.0",
+      "platforms": [
+        "windows"
+      ],
+      "risk_level": "high",
+      "permissions": {
+        "network": true,
+        "filesystem_read": true,
+        "filesystem_write": true,
+        "credentials": true,
+        "external_state": true,
+        "cost_or_quota": true
+      },
+      "dependencies": [
+        "Windows",
+        "Python 3.10+",
+        "PowerShell",
+        "Git and GitHub CLI for GitHub-backed transfer modes",
+        "User-configured private repository and external machine/instance registry for complete backups"
+      ],
+      "invocation_policy": "explicit-only",
+      "license": "MIT",
+      "version": "0.1.0",
+      "archive_sha256": "180dd9f554744fab24c30614c0493e4bf845f4f5724d054b16f5b6362615358c"
+    }
+  ]
+}
