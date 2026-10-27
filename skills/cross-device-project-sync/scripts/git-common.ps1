@@ -70,11 +70,21 @@ function Set-SyncGitTimeout {
 }
 
 function Get-SyncDeviceLabel {
-    param([AllowEmptyString()][string]$Requested)
+    param([AllowNull()][AllowEmptyString()][string]$Requested)
     $label = $Requested
     $configPath = $null
     if ([string]::IsNullOrWhiteSpace($label)) {
-        $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE '.codex' }
+        if (-not [string]::IsNullOrWhiteSpace($env:CODEX_HOME)) {
+            $codexHome = $env:CODEX_HOME
+        } else {
+            $profileRoot = [Environment]::GetFolderPath([Environment+SpecialFolder]::UserProfile)
+            if ([string]::IsNullOrWhiteSpace($profileRoot)) { $profileRoot = $env:USERPROFILE }
+            if ([string]::IsNullOrWhiteSpace($profileRoot)) { $profileRoot = $env:HOME }
+            if ([string]::IsNullOrWhiteSpace($profileRoot)) {
+                throw 'Unable to determine the user profile directory. Set CODEX_HOME explicitly.'
+            }
+            $codexHome = Join-Path $profileRoot '.codex'
+        }
         $configPath = Join-Path $codexHome 'cross-device-project-sync-device.json'
         if (Test-Path -LiteralPath $configPath -PathType Leaf) {
             $config = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
