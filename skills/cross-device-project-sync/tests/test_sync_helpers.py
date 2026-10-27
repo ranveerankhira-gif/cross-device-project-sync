@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -241,14 +242,25 @@ class SyncHelpers(unittest.TestCase):
     def test_git_timeout_terminates_remote_helper_process_tree(self):
         repo = self.repo()
         marker = self.root / "remote-helper-survived.txt"
-        helper = self.root / "slow-remote.cmd"
-        helper.write_text(
-            "@echo off\n"
-            "ping 127.0.0.1 -n 4 >nul\n"
-            f'echo survived>"{marker}"\n'
-            "exit /b 1\n",
-            encoding="utf-8",
-        )
+        if os.name == "nt":
+            helper = self.root / "slow-remote.cmd"
+            helper.write_text(
+                "@echo off\n"
+                "ping 127.0.0.1 -n 4 >nul\n"
+                f'echo survived>"{marker}"\n'
+                "exit /b 1\n",
+                encoding="utf-8",
+            )
+        else:
+            helper = self.root / "slow-remote.sh"
+            helper.write_text(
+                "#!/bin/sh\n"
+                "sleep 3\n"
+                f"printf survived > {shlex.quote(str(marker))}\n"
+                "exit 1\n",
+                encoding="utf-8",
+            )
+            helper.chmod(0o755)
         self.git(repo, "remote", "add", "origin", "ext::" + helper.as_posix())
         self.git(repo, "config", "branch.main.remote", "origin")
         self.git(repo, "config", "branch.main.merge", "refs/heads/main")
