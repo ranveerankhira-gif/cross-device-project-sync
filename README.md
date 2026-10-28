@@ -1,13 +1,28 @@
 # 跨设备项目同步 Skill
 
-一个面向 Windows 与 Codex 的显式调用 Skill：把完整项目、允许迁移的对话和 Git 开发状态按不同语义安全地搬到另一台设备，并用清单、哈希、不可变 Release 与事务式恢复验证结果。
+**换电脑时，把项目文件、允许迁移的 Codex 对话和 Git 开发状态分别搬对，而不是把整台机器稀里糊涂复制过去。**
 
-> A safety-first Windows Skill for verifiable project backup, Codex conversation migration, restore, and Git synchronization across devices.
+`cross-device-project-sync` 是一个面向 Windows 与 Codex 的显式调用 Skill。它区分完整项目备份、对话接力和 Git 开发同步，并用清单、SHA-256、不可变 Release 与事务式恢复验证迁移结果。
+
+> Verifiable Windows project backup, Codex conversation migration, transactional restore, and Git synchronization across devices.
 
 [![Skill](https://img.shields.io/badge/skill-1-2563eb)](#核心能力)
+[![Latest release](https://img.shields.io/github/v/release/ranveerankhira-gif/cross-device-project-sync?label=release)](https://github.com/ranveerankhira-gif/cross-device-project-sync/releases/latest)
+[![Validate](https://github.com/ranveerankhira-gif/cross-device-project-sync/actions/workflows/validate.yml/badge.svg)](https://github.com/ranveerankhira-gif/cross-device-project-sync/actions/workflows/validate.yml)
 [![Platform](https://img.shields.io/badge/platform-Windows-0078d4)](#运行要求)
 [![Explicit only](https://img.shields.io/badge/invocation-explicit--only-d97706)](#安全边界)
 [![License: MIT](https://img.shields.io/badge/license-MIT-16a34a)](LICENSE)
+
+## 先判断你需要哪种同步
+
+| 你的目标 | 使用的模式 |
+|---|---|
+| 把未提交文件、媒体、依赖和 `.git` 一起搬到新设备 | **完整项目迁移** |
+| 只把允许迁移的 Codex 对话和接收状态带过去 | **对话接力** |
+| 只同步已经选择并提交的代码历史 | **Git 开发同步** |
+| 在新设备恢复备份，同时保留校验和回滚证据 | **事务式恢复** |
+
+**立即使用：**前往 [最新 Release](https://github.com/ranveerankhira-gif/cross-device-project-sync/releases/latest)，下载 `cross-device-project-sync-<version>.zip`，并用 `SHA256SUMS.txt` 核对文件。
 
 ## 它解决什么问题
 
@@ -30,7 +45,7 @@
 
 ## 安装
 
-正式版本请从 GitHub Releases 下载，并核对同一版本的 `SHA256SUMS.txt`。
+正式版本请从 [GitHub Releases](https://github.com/ranveerankhira-gif/cross-device-project-sync/releases/latest) 下载，并核对同一版本的 `SHA256SUMS.txt`。
 
 1. 下载 `cross-device-project-sync-<version>.zip`。
 2. 核对 SHA-256，并阅读 `SKILL.md`、`agents/openai.yaml`、脚本和安全说明。
@@ -76,4 +91,8 @@ python -X utf8 -m unittest discover -s scripts/tests -v
 python -X utf8 -m unittest discover -s skills/cross-device-project-sync/tests -v
 python -m compileall -q skills scripts
 ```
+
+---
+
+如果它帮你避免了一次“代码到了、项目没到”或“文件到了、对话丢了”的迁移事故，欢迎点一个 ⭐，让更多跨设备 Codex 用户找到它。
 
